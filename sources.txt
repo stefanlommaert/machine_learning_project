@@ -1,0 +1,4 @@
+video openspiel: https://www.youtube.com/watch?v=YE0E0F39lac
+replicator dynamics: http://systems-sciences.uni-graz.at/etextbook/gametheory/replicator.html
+Nash Convergence of Gradient Dynamics in Iterated General-Sum Games: https://arxiv.org/pdf/1301.3892.pdf
+openspiel doc: https://arxiv.org/pdf/1908.09453.pdf
