@@ -5,13 +5,13 @@ from open_spiel.python.egt import dynamics
 from open_spiel.python.egt.utils import game_payoffs_array
 import matplotlib.pyplot as plt
 
-plot_name = 'Dispersion game'
-row_player = [[-1,1],[1,-1]]
-vector_player = [[-1,1],[1,-1]]
+# plot_name = 'Dispersion game'
+# row_player = [[-1,1],[1,-1]]
+# vector_player = [[-1,1],[1,-1]]
 
-# plot_name = 'Battle of the sexes'
-# row_player = [[3,0],[0,2]]
-# vector_player = [[2,0],[0,3]]
+plot_name = 'Battle of the sexes'
+row_player = [[3,0],[0,2]]
+vector_player = [[2,0],[0,3]]
 
 # plot_name = 'Subsidy game'
 # row_player = [[10,0],[11,12]]
@@ -30,6 +30,7 @@ game = pyspiel.create_matrix_game(row_player, vector_player)
 state = game.new_initial_state()
 
 X, Y = np.meshgrid(np.linspace(0.0, 1.0, 10), np.linspace(0.0, 1.0, 10))
+
 u, v = np.zeros_like(X), np.zeros_like(X)
 NI, NJ = X.shape
 payoff_matrix = game_payoffs_array(game)
@@ -48,6 +49,7 @@ for i in range(NI):
         alpha, beta = X[i, j], Y[i, j]
         u[i,j] = beta*((r11+r22)-(r21+r12))-(r22-r12)
         v[i,j] = alpha*((c11+c22)-(c21+c12))-(c22-c12)
+       
         #projection of vector on border when point lies on border
         if (alpha==0 or alpha==1):
             u[i,j]=0
