@@ -20,8 +20,19 @@ state = game.new_initial_state()
 X, Y = np.meshgrid(np.linspace(0.0, 1.0, 50), np.linspace(0.0, 1.0, 50))
 u, v = np.zeros_like(X), np.zeros_like(X)
 NI, NJ = X.shape
+payoff_matrix = game_payoffs_array(game)
 for i in range(NI):
     for j in range(NJ):
+        # hier probeer ik de klote API van openspiel (spoiler: het trekt op niks!)
+        # dynX = dynamics.SinglePopulationDynamics(payoff_matrix, dynamics.replicator)
+        # dynY = dynamics.SinglePopulationDynamics(payoff_matrix, dynamics.replicator)
+
+        # xChance = np.array([X[i, j], 1-X[i, j]])
+        # yChance = np.array([Y[i, j], 1-Y[i, j]])
+        # u[i,j] = dynX(yChance)[0]
+        # v[i,j] = dynY(xChance)[0]
+
+        # deze methode gebruikt de functies van paper 3 (Nash Convergence of Gradient Dynamics in Iterated General-Sum Games)
         alpha, beta = X[i, j], Y[i, j]
         u[i,j] = beta*((r11+r22)-(r21+r12))-(r22-r12)
         v[i,j] = alpha*((c11+c22)-(c21+c12))-(c22-c12)
