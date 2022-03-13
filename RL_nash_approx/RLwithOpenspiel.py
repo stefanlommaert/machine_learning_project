@@ -38,7 +38,7 @@ flags.DEFINE_string("game", "matrix_pd", "Name of the game.") #WELKE GAME WILLEN
 flags.DEFINE_integer("num_episodes", int(1e5), "Number of train episodes.") #HOEVEEL ITERATIES?
 flags.DEFINE_integer("eval_every", int(1e3), #HOEVAAK BENCHMARKS RUNNEN?
                      "How often to evaluate the policy.")
-flags.DEFINE_enum("algorithm", "rpg", ["dqn", "rpg", "qpg", "rm", "eva", "a2c"],
+flags.DEFINE_enum("algorithm", "eva", ["dqn", "rpg", "qpg", "rm", "eva", "a2c"],
                   "Algorithms to run.") #WELKE ALGORITM VOOR DE PLAYER GEBRUIKEN?
 
 
@@ -108,8 +108,7 @@ def main_loop(unused_arg):
           critic_learning_rate=0.1,
           pi_learning_rate=0.1,
           num_critic_before_pi=3)
-    elif FLAGS.algorithm == "dqn": #hier moet dus nog een agent worden aangemaakt 
-      print("WE DOEEINNNN THE DQNNN LEARNING DUDE")
+    elif FLAGS.algorithm == "dqn": 
       agent = dqn.DQN(
           sess,
           player_id=0,
@@ -193,7 +192,7 @@ def main_loop(unused_arg):
         logging.info("Loss: %s", agent.loss)
         avg_return = _eval_agent(env, agent,agent2, 100)
         logging.info("Avg return: %s", avg_return)
-        P1_averages.append(agent_output.probs[0]) # these are the coordinates to position the label
+        P1_averages.append(agent_output.probs[0]) #
         P2_averages.append(agent2_output.probs[0])
         print("player1 probability of action1: ",agent_output.probs[0])
         print("player2 probability of action2: ",agent2_output.probs[0])
