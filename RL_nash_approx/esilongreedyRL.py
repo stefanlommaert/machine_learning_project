@@ -38,6 +38,7 @@ c21 = vector_player[1][0]
 c22 = vector_player[1][1]
 
 game = pyspiel.create_matrix_game(row_player, vector_player)
+# game = pyspiel.load_matrix_game("matrix_pd")
 payoff_tensor= game_payoffs_array(game) 
 
 rewardsP1  =[0,0]
@@ -52,6 +53,8 @@ averagerewardsP2= [0,0]
 def P1explore():
     return random.choice(options)
 
+def P1exploit():
+    return averagerewardsP1.index(max(averagerewardsP1))
 
 def P1_select_action():
     if (random.random()<epsilon):
@@ -62,6 +65,8 @@ def P1_select_action():
 def P2explore():
     return random.choice(options)
 
+def P2exploit():
+    return averagerewardsP2.index(max(averagerewardsP2))
 
 def P2_select_action():
     if (random.random()<epsilon):
@@ -69,7 +74,7 @@ def P2_select_action():
     else:
         return P2exploit()
     
-def P1exploit():
+def calculate_utility(payoff_array):
     if sum(countsP1)==0 : 
         alpha=0.5
         beta=0.5
@@ -80,34 +85,13 @@ def P1exploit():
                                 
     
     
-    r11 = row_player[0][0]
-    r12 = row_player[0][1]
-    r21 = row_player[1][0]
-    r22 = row_player[1][1]
-    utility_action1 = r11*(beta)*r12*(beta-1)
-    utility_action2 = r21*beta * r22*(beta-1)
-     
-    return (0 if (utility_action1>utility_action2) else 1)
+    r11 = payoff_array[0][0]
+    r12 = payoff_array[0][1]
+    r21 = payoff_array[1][0]
+    r22 = payoff_array[1][1]
+    utility_player = r11*(alpha*beta) + r22*((1- alpha)*(1- beta)) + r12*(alpha*(1-beta))+ r21*((1-alpha)*beta)
+    return round(utility_player, 5)    
 
-def P2exploit():
-    if sum(countsP1)==0 : 
-        alpha=0.5
-        beta=0.5
-    
-    else:
-        alpha = float(countsP1[0])/float(sum(countsP1))
-        beta  = float(countsP2[0])/float(sum(countsP2))
-                                
-    
-    
-    r11 = vector_player[0][0]
-    r12 = vector_player[0][1]
-    r21 = vector_player[1][0]
-    r22 = vector_player[1][1]
-    utility_action1 = r11*(alpha)*r12*(alpha-1)
-    utility_action2 = r21*alpha * r22*(alpha-1)
-     
-    return (0 if (utility_action1>utility_action2) else 1)
 
 def update(p1action,p2action):
     payoffP1 = payoff_tensor[0,p1action,p2action]
@@ -149,7 +133,7 @@ def play_game(i):
 
 play_game(100000)
 plt.axis('square')
-plt.title("Adverse RL :"+plot_name)
+plt.title("Adverse RL MatchingPennies")
 plt.xlabel('Player 1, probability of action 1')
 plt.ylabel('Player 2, probability of action 1')
 plt.axis([0, 1, 0, 1])
@@ -164,7 +148,25 @@ y = np.array(P2_averages)
 # plot the data
 plt.plot(x,y)
 
+# number_label=measurement_stepsize om de hoeveelste plot level aan te duiden maar is nogal scuffed
 
+
+label  = "start"
+
+plt.annotate(label, # this is the texst
+             (x[0],y[0]), # these are the coordinates to position the label
+             textcoords="offset points", # how to position the texst
+             xytext=(0,1), # distance from texst to points (xs,ys)
+             ha='center',
+             fontsize=10) # horizontal alignment can be left, right or center
+label  = "end"
+
+plt.annotate(label, # this is the texst
+             (x[-1],y[-1]), # these are the coordinates to position the label
+             textcoords="offset points", # how to position the texst
+             xytext=(0,1), # distance from texst to points (xs,ys)
+             ha='center',
+             fontsize=10) # horizontal alignment can be left, right or center
 plt.show()
 
 
