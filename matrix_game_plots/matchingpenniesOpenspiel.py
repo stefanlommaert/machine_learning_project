@@ -16,8 +16,8 @@ dyn = dynamics.MultiPopulationDynamics(payoff_tensor, dynamics.replicator)
 
 fig = plt.figure(figsize=(4,4))
 ax = fig.add_subplot(111, projection="2x2") # schaal , keuze plot 
-res = ax.quiver(dyn)
-#ax.streamplot(dyn)
+#res = ax.quiver(dyn)
+ax.streamplot(dyn)
 
 plt.title("Matching pennies")
 plt.xlabel('Player 1, probability of action heads')
