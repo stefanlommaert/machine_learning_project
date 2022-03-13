@@ -10,7 +10,34 @@ from matplotlib.quiver import Quiver
 
 epsilon =  0.1
 options = [0,1] #0 is head 1 is tail 
-game    =  pyspiel.create_matrix_game([[-1, 1], [1, -1]], [[1, -1], [-1, 1]]) #matchin pennies
+
+# plot_name = 'Dispersion game'
+# row_player = [[-1,1],[1,-1]]
+# vector_player = [[-1,1],[1,-1]]
+
+# plot_name = 'Battle of the sexes'
+# row_player = [[3,0],[0,2]]
+# vector_player = [[2,0],[0,3]]
+
+# plot_name = 'Subsidy game'
+# row_player = [[10,0],[11,12]]
+# vector_player = [[10,11],[0,12]]
+
+plot_name = 'Matching pennies'
+row_player=[[-1, 1], [1, -1]]
+vector_player = [[1, -1], [-1, 1]]
+
+
+r11 = row_player[0][0]
+r12 = row_player[0][1]
+r21 = row_player[1][0]
+r22 = row_player[1][1]
+c11 = vector_player[0][0]
+c12 = vector_player[0][1]
+c21 = vector_player[1][0]
+c22 = vector_player[1][1]
+
+game = pyspiel.create_matrix_game(row_player, vector_player)
 payoff_tensor= game_payoffs_array(game) 
 
 rewardsP1  =[0,0]
@@ -22,9 +49,6 @@ countsP2   = [0,0]
 averagerewardsP2= [0,0]
 
 
-
-payofftableP1 = np.array([[1,-1],[-1, 1]])
-
 def P1explore():
     return random.choice(options)
 
@@ -32,7 +56,7 @@ def P1exploit():
     return averagerewardsP1.index(max(averagerewardsP1))
 
 def P1_select_action():
-    if (random.random()>epsilon):
+    if (random.random()<epsilon):
         return P1explore()
     else:
         return P1exploit()
@@ -44,7 +68,7 @@ def P2exploit():
     return averagerewardsP2.index(max(averagerewardsP2))
 
 def P2_select_action():
-    if (random.random()>epsilon):
+    if (random.random()<epsilon):
         return P2explore()
     else:
         return P2exploit()
@@ -88,7 +112,7 @@ def play_game(i):
        
         
 
-play_game(1000)
+play_game(100000)
 plt.axis('square')
 plt.title("Adverse RL MatchingPennies")
 plt.xlabel('Player 1, probability of action 1')
