@@ -149,7 +149,7 @@ def play_game(i):
 
 play_game(100000)
 plt.axis('square')
-plt.title("Adverse RL MatchingPennies")
+plt.title("Adverse RL :"+plot_name)
 plt.xlabel('Player 1, probability of action 1')
 plt.ylabel('Player 2, probability of action 1')
 plt.axis([0, 1, 0, 1])
@@ -164,19 +164,7 @@ y = np.array(P2_averages)
 # plot the data
 plt.plot(x,y)
 
-# number_label=measurement_stepsize om de hoeveelste plot level aan te duiden maar is nogal scuffed
 
-# for xs,ys in zip(x,y):
-    
-#     label = str(number_label)
-#     number_label+=measurement_stepsize
-
-#     plt.annotate(label, # this is the texst
-#                  (xs,ys), # these are the coordinates to position the label
-#                  textcoords="offset points", # how to position the texst
-#                  xytext=(0,1), # distance from texst to points (xs,ys)
-#                  ha='center',
-#                  fontsize=4) # horizontal alignment can be left, right or center
 plt.show()
 
 
