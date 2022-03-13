@@ -9,6 +9,10 @@ import matplotlib.pyplot as plt
 # row_player = [[-1,1],[1,-1]]
 # vector_player = [[-1,1],[1,-1]]
 
+# plot_name = 'matching pennies'
+# row_player = [[1,-1],[-1,1]]
+# vector_player = [[-1,1],[1,-1]]
+
 plot_name = 'Battle of the sexes'
 row_player = [[3,0],[0,2]]
 vector_player = [[2,0],[0,3]]
