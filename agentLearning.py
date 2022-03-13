@@ -42,6 +42,9 @@ def q_learning(chance_distribution_array, payoff_array):
     
 def calculate_utility(chance_distribution_array, payoff_array):
     alpha, beta = chance_distribution_array[0], chance_distribution_array[1]
+    print(alpha)
+    print(beta)
+    
     r11 = payoff_array[0][0]
     r12 = payoff_array[0][1]
     r21 = payoff_array[1][0]
