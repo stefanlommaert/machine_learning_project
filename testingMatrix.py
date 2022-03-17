@@ -9,7 +9,6 @@ plot_name = 'Dispersion game'
 row_player = [[-1,1],[1,-1]]
 vector_player = [[-1,1],[1,-1]]
 
-<<<<<<< Updated upstream
 # plot_name = 'matching pennies'
 # row_player = [[1,-1],[-1,1]]
 # vector_player = [[-1,1],[1,-1]]
@@ -17,11 +16,6 @@ vector_player = [[-1,1],[1,-1]]
 plot_name = 'Battle of the sexes'
 row_player = [[3,0],[0,2]]
 vector_player = [[2,0],[0,3]]
-=======
-# plot_name = 'Battle of the sexes'
-# row_player = [[3,0],[0,2]]
-# vector_player = [[2,0],[0,3]]
->>>>>>> Stashed changes
 
 # plot_name = 'Subsidy game'
 # row_player = [[10,0],[11,12]]
