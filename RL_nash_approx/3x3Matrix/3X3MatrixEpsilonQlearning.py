@@ -67,7 +67,7 @@ def P1exploit():
      
     utility_action2 = row_player[1][0]*rockchanceP2 + row_player[1][1]*paperchanceP2 + row_player[1][2]*scissorchanceP2 
     utility_action3 = row_player[2][0]*rockchanceP2 + row_player[2][1]*paperchanceP2 + row_player[2][2]*scissorchanceP2
-    all_actions= [utility_action1, utility_action2, utility_action3]
+    all_actions= [utility_action1, utility_action2, utility_action3] 
      
     return (all_actions.index(max(all_actions)))
 
@@ -84,13 +84,13 @@ def P2exploit():
         scissorchanceP1  = float(countsP1[2])/float(sum(countsP1))
                                 
     
-    print(rockchanceP1,paperchanceP1,scissorchanceP1)
+    # print(rockchanceP1,paperchanceP1,scissorchanceP1)
   
     utility_action1 = vector_player[0][0]*rockchanceP1 + vector_player[0][1]*paperchanceP1 + vector_player[0][2]*scissorchanceP1 
      
     utility_action2 = vector_player[1][0]*rockchanceP1 + vector_player[1][1]*paperchanceP1 + vector_player[1][2]*scissorchanceP1 
     utility_action3 = vector_player[2][0]*rockchanceP1 + vector_player[2][1]*paperchanceP1 + vector_player[2][2]*scissorchanceP1
-    all_actions= [utility_action1, utility_action2, utility_action3]
+    all_actions= [utility_action1, utility_action2, utility_action3] #TODO: hier klopt iets niet nu is het 
     print("all_actions: ",all_actions)   
     return (all_actions.index(max(all_actions)))
 def update(p1action,p2action):
