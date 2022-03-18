@@ -11,17 +11,17 @@ from matplotlib.quiver import Quiver
 import matplotlib.pyplot as plt
 
 
-plot_name = 'Dispersion game'
-row_player = [[-1,1],[1,-1]]
-vector_player = [[-1,1],[1,-1]]
+# plot_name = 'Dispersion game'
+# row_player = [[-1,1],[1,-1]]
+# vector_player = [[-1,1],[1,-1]]
 
 # plot_name = 'matching pennies'
 # row_player = [[1,-1],[-1,1]]
 # vector_player = [[-1,1],[1,-1]]
 
-# plot_name = 'Battle of the sexes'
-# row_player = [[3,0],[0,2]]
-# vector_player = [[2,0],[0,3]]
+plot_name = 'Battle of the sexes'
+row_player = [[3,0],[0,2]]
+vector_player = [[2,0],[0,3]]
 
 # plot_name = 'Subsidy game'
 # row_player = [[10,0],[11,12]]
@@ -46,7 +46,7 @@ ax = fig.add_subplot(111, projection="2x2") # schaal , keuze plot
 res = ax.quiver(dyn)
 #ax.streamplot(dyn)
 
-plt.title("Battle of the Sexes")
-plt.xlabel('Woman, probability of action 1')
-plt.ylabel('Man, probability of action 1')
+plt.title("Gradient plot: "+plot_name)
+plt.xlabel('Player 1, probability of action 1')
+plt.ylabel('Player 2, probability of action 1')
 plt.show()

@@ -4,3 +4,4 @@ Nash Convergence of Gradient Dynamics in Iterated General-Sum Games: https://arx
 openspiel doc: https://arxiv.org/pdf/1908.09453.pdf
 openspiel API: https://github.com/deepmind/open_spiel/blob/master/open_spiel/python/pybind11/pyspiel.cc
 boltzman paper: http://michaelkaisers.com/publications/2010_BNAIC_Bloembergen_2x2.pdf
+Lenient Q learning: http://www.flowermountains.nl/pub/Bloembergen2010lfaq.pdf echte GOAT paper 

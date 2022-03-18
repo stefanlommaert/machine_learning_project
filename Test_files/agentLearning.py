@@ -2,7 +2,7 @@ from types import new_class
 from matplotlib import pyplot as plt
 
 import numpy as np
-
+#TODO: DIT WEG DENK IK (of gewoon verplaatsen)
 
 row_player = [[1,-1],[-1,1]]
 vector_player = [[-1,1],[1,-1]]

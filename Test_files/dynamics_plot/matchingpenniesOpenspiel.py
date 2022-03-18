@@ -1,6 +1,7 @@
 #from matplotlib import pyplot as plt
 #imports zijn wel nodig om de projections in de registers van pyplot te steken (dus niet aankomen ;) )
-#meer voorbeelden :=> open_spiel/open_spiel/python/egt/visualization_test.py 
+#meer voorbeelden :=> open_spiel/open_spiel/python/egt/visualization_test.py
+#TODO: DIT WEGDOEN DENK IK  
 import pyspiel
 import numpy as np
 from open_spiel.python.egt import dynamics

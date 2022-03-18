@@ -32,6 +32,8 @@ from open_spiel.python.algorithms import eva
 from open_spiel.python.algorithms import policy_gradient
 from open_spiel.python.environments import catch
 from open_spiel.python import rl_environment
+import ternary
+import matplotlib
 
 
 FLAGS = flags.FLAGS
@@ -69,21 +71,8 @@ def main_loop(unused_arg):
   #env = catch.Environment()
   
   env_configs = {}
-  plot_name = 'Dispersion game'
-  row_player = [[-1,1],[1,-1]]
-  vector_player = [[-1,1],[1,-1]]
-
-  # plot_name = 'matching pennies'
-  # row_player = [[1,-1],[-1,1]]
-  # vector_player = [[-1,1],[1,-1]]
-
-  # plot_name = 'Battle of the sexes'
-  # row_player = [[3,0],[0,2]]
-  # vector_player = [[2,0],[0,3]]
-
-  # plot_name = 'Subsidy game'
-  # row_player = [[10,0],[11,12]]
-  # vector_player = [[10,11],[0,12]]
+  row_player = [[0, -0.25, 0.5], [0.25, 0, -0.05], [-0.5, 0.05, 0]]
+  vector_player = [[0, 0.25, -0.5], [-0.25, 0, 0.05], [0.5, -0.05, 0]]
   game = pyspiel.create_matrix_game(row_player, vector_player)
   
   env = rl_environment.Environment(game, **env_configs) 
@@ -210,47 +199,89 @@ def main_loop(unused_arg):
         # logging.info("Loss: %s", agent.loss)
         # avg_return = _eval_agent(env, agent,agent2, 5)
         # logging.info("Avg return: %s", avg_return)
-        P1_averages.append(agent_output.probs[0]) #
-        P2_averages.append(agent2_output.probs[0])
-        print("player1 probability of action1: ",agent_output.probs[0])
-        print("player2 probability of action2: ",agent2_output.probs[0])
-    plt.axis('square')
-    plt.title("Policy Gradient self-play: "+plot_name)
-    plt.xlabel('Player 1, probability of action 1')
-    plt.ylabel('Player 2, probability of action 1')
-    plt.axis([0, 1, 0, 1])
-    
-    
-    # create some x data and some integers for the y axis
-    x = np.array(P1_averages)
-    y = np.array(P2_averages)
-    
-    
-    
-    # plot the data
-    plt.plot(x,y)
-    
-    # number_label=measurement_stepsize om de hoeveelste plot level aan te duiden maar is nogal scuffed
-    
-    
-    label  = "start"
-    
-    plt.annotate(label, # this is the texst
-                (x[0],y[0]), # these are the coordinates to position the label
-                textcoords="offset points", # how to position the texst
-                xytext=(0,1), # distance from texst to points (xs,ys)
-                ha='center',
-                fontsize=10) # horizontal alignment can be left, right or center
-    label  = "end"
-    
-    plt.annotate(label, # this is the texst
-                (x[-1],y[-1]), # these are the coordinates to position the label
-                textcoords="offset points", # how to position the texst
-                xytext=(0,1), # distance from texst to points (xs,ys)
-                ha='center',
-                fontsize=10) # horizontal alignment can be left, right or center
-    plt.show()    
+        P1_averages.append(agent_output.probs) #
+        P2_averages.append(agent2_output.probs)
+        print("player1 probabilitys: ",agent_output.probs)
+        print("player2 probabilitys: ",agent2_output.probs)
 
+  episodes= 100000
+  fig, tax = ternary.figure(scale=100)
+  fig.set_size_inches(10, 9)
+
+  # Plot points.
+  points =  P2_averages
+  points = [(100*x,100*y,100*z) for (x, y, z) in points]
+  tax.plot_colored_trajectory(points, cmap="hsv", linewidth=2.0)
+
+  # Axis labels. (See below for corner labels.)
+  fontsize = 14
+  offset = 0.08
+  tax.left_axis_label("Rock %", fontsize=fontsize, offset=offset)
+  tax.right_axis_label("Paper %", fontsize=fontsize, offset=offset)
+  tax.bottom_axis_label("Scissor %", fontsize=fontsize, offset=-offset)
+  tax.set_title("Policy Gradient RPS player 2, "+"episodes = "+str(episodes), fontsize=20)
+
+  # Decoration.
+  tax.boundary(linewidth=1)
+  tax.gridlines(multiple=10, color="gray")
+  tax.ticks(axis='lbr', linewidth=1, multiple=20)
+  tax.get_axes().axis('off')
+
+  label= "start"
+  tax.annotate(label, # this is the texst
+              (points[0][0],points[0][1],points[0][2]), # these are the coordinates to position the label
+              textcoords="offset points", # how to position the texst
+              xytext=(0,1),
+              ha='center',
+              fontsize=10) # horizontal alignment can be left, right or center
+  label  = "end"
+
+  tax.annotate(label, # this is the texst
+              (points[-1][0],points[-1][1],points[-1][2]), # these are the coordinates to position the label
+              textcoords="offset points", # how to position the texst
+              ha='center',
+                xytext=(0,1),
+              fontsize=10) # horizontal alignment can be left, right or center
+
+  fig_P1, tax_P1 = ternary.figure(scale=100)
+  fig_P1.set_size_inches(10, 9)
+
+  # Plot points.
+  points =  P1_averages
+  points = [(100*x,100*y,100*z) for (x, y, z) in points]
+  tax_P1.plot_colored_trajectory(points, cmap="hsv", linewidth=2.0)
+
+  # Axis labels. (See below for corner labels.)
+  fontsize = 14
+  offset = 0.08
+  tax_P1.left_axis_label("Rock %", fontsize=fontsize, offset=offset)
+  tax_P1.right_axis_label("Paper %", fontsize=fontsize, offset=offset)
+  tax_P1.bottom_axis_label("Scissor %", fontsize=fontsize, offset=-offset)
+  tax_P1.set_title("Policy Gradient RPS player 1, "+"episodes = "+str(episodes), fontsize=20)
+
+  # Decoration.
+  tax_P1.boundary(linewidth=1)
+  tax_P1.gridlines(multiple=10, color="gray")
+  tax_P1.ticks(axis='lbr', linewidth=1, multiple=20)
+  tax_P1.get_axes().axis('off')
+
+  label= "start"
+  tax_P1.annotate(label, # this is the texst
+              (points[0][0],points[0][1],points[0][2]), # these are the coordinates to position the label
+              textcoords="offset points", # how to position the texst
+              xytext=(0,1),
+              ha='center',
+              fontsize=10) # horizontal alignment can be left, right or center
+  label  = "end"
+
+  tax_P1.annotate(label, # this is the texst
+              (points[-1][0],points[-1][1],points[-1][2]), # these are the coordinates to position the label
+              textcoords="offset points", # how to position the texst
+              ha='center',
+                xytext=(0,1),
+              fontsize=10) # horizontal alignment can be left, right or center
+  tax.show()
+  tax_P1.show()
 
 if __name__ == "__main__":
   app.run(main_loop)

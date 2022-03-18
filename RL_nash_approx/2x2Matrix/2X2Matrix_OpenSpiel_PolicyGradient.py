@@ -35,12 +35,11 @@ from open_spiel.python import rl_environment
 
 
 FLAGS = flags.FLAGS
-
 flags.DEFINE_string("game", "matrix_pd", "Name of the game.") #WELKE GAME WILLEN WE TESTEN?
 flags.DEFINE_integer("num_episodes", int(1e5), "Number of train episodes.") #HOEVEEL ITERATIES?
 flags.DEFINE_integer("eval_every", int(1e2), #HOEVAAK BENCHMARKS RUNNEN?
                      "How often to evaluate the policy.")
-flags.DEFINE_enum("algorithm", "dqn", ["dqn", "rpg", "qpg", "rm", "eva", "a2c"],
+flags.DEFINE_enum("algorithm", "a2c", ["dqn", "rpg", "qpg", "rm", "eva", "a2c"],
                   "Algorithms to run.") #WELKE ALGORITM VOOR DE PLAYER GEBRUIKEN?
 
 
@@ -66,7 +65,7 @@ def _eval_agent(env, agent1,agent2, num_episodes):#EVALUATION SCRIPT VOOR DE LEA
 
 
 def main_loop(unused_arg):
-  """Trains a DQN agent in the catch environment."""
+  """Trains a Policy Gradient agent in the catch environment."""
   #env = catch.Environment()
   
   env_configs = {}
@@ -78,16 +77,16 @@ def main_loop(unused_arg):
   # row_player = [[1,-1],[-1,1]]
   # vector_player = [[-1,1],[1,-1]]
 
-  plot_name = 'Battle of the sexes'
-  row_player = [[3,0],[0,2]]
-  vector_player = [[2,0],[0,3]]
+  # plot_name = 'Battle of the sexes'
+  # row_player = [[3,0],[0,2]]
+  # vector_player = [[2,0],[0,3]]
 
-  # plot_name = 'Subsidy game'
-  # row_player = [[10,0],[11,12]]
-  # vector_player = [[10,11],[0,12]]
+  plot_name = 'Subsidy game'
+  row_player = [[10,0],[11,12]]
+  vector_player = [[10,11],[0,12]]
   game = pyspiel.create_matrix_game(row_player, vector_player)
   
-  env = rl_environment.Environment(FLAGS.game, **env_configs) #TODO: OMZETTEN NAAR ELKE GAME NIET GEWOON EEN GAME IN OPENSPIEL
+  env = rl_environment.Environment(game, **env_configs) 
   num_actions = env.action_spec()["num_actions"]
 
   # agents = [
@@ -208,7 +207,7 @@ def main_loop(unused_arg):
       if ep and ep % FLAGS.eval_every == 0:
         logging.info("-" * 80)
         logging.info("Episode %s", ep)
-        logging.info("Loss: %s", agent.loss)
+        # logging.info("Loss: %s", agent.loss)
         # avg_return = _eval_agent(env, agent,agent2, 5)
         # logging.info("Avg return: %s", avg_return)
         P1_averages.append(agent_output.probs[0]) #
@@ -216,7 +215,7 @@ def main_loop(unused_arg):
         print("player1 probability of action1: ",agent_output.probs[0])
         print("player2 probability of action2: ",agent2_output.probs[0])
     plt.axis('square')
-    plt.title("DQN self-play: "+plot_name)
+    plt.title("Policy Gradient self-play: "+plot_name+ ", episodes = "+"1e5")
     plt.xlabel('Player 1, probability of action 1')
     plt.ylabel('Player 2, probability of action 1')
     plt.axis([0, 1, 0, 1])
