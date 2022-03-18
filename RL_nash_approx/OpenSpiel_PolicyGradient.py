@@ -23,6 +23,7 @@ from absl import app
 from absl import flags
 from matplotlib import pyplot as plt
 import numpy as np
+import pyspiel
 
 
 import tensorflow.compat.v1 as tf
@@ -36,9 +37,9 @@ from open_spiel.python import rl_environment
 FLAGS = flags.FLAGS
 flags.DEFINE_string("game", "matrix_pd", "Name of the game.") #WELKE GAME WILLEN WE TESTEN?
 flags.DEFINE_integer("num_episodes", int(1e5), "Number of train episodes.") #HOEVEEL ITERATIES?
-flags.DEFINE_integer("eval_every", int(1e3), #HOEVAAK BENCHMARKS RUNNEN?
+flags.DEFINE_integer("eval_every", int(1e2), #HOEVAAK BENCHMARKS RUNNEN?
                      "How often to evaluate the policy.")
-flags.DEFINE_enum("algorithm", "eva", ["dqn", "rpg", "qpg", "rm", "eva", "a2c"],
+flags.DEFINE_enum("algorithm", "a2c", ["dqn", "rpg", "qpg", "rm", "eva", "a2c"],
                   "Algorithms to run.") #WELKE ALGORITM VOOR DE PLAYER GEBRUIKEN?
 
 
@@ -64,11 +65,28 @@ def _eval_agent(env, agent1,agent2, num_episodes):#EVALUATION SCRIPT VOOR DE LEA
 
 
 def main_loop(unused_arg):
-  """Trains a DQN agent in the catch environment."""
+  """Trains a Policy Gradient agent in the catch environment."""
   #env = catch.Environment()
   
   env_configs = {}
-  env = rl_environment.Environment(FLAGS.game, **env_configs) #TODO: OMZETTEN NAAR ELKE GAME NIET GEWOON EEN GAME IN OPENSPIEL
+  plot_name = 'Dispersion game'
+  row_player = [[-1,1],[1,-1]]
+  vector_player = [[-1,1],[1,-1]]
+
+  # plot_name = 'matching pennies'
+  # row_player = [[1,-1],[-1,1]]
+  # vector_player = [[-1,1],[1,-1]]
+
+  # plot_name = 'Battle of the sexes'
+  # row_player = [[3,0],[0,2]]
+  # vector_player = [[2,0],[0,3]]
+
+  # plot_name = 'Subsidy game'
+  # row_player = [[10,0],[11,12]]
+  # vector_player = [[10,11],[0,12]]
+  game = pyspiel.create_matrix_game(row_player, vector_player)
+  
+  env = rl_environment.Environment(game, **env_configs) 
   num_actions = env.action_spec()["num_actions"]
 
   # agents = [
@@ -109,7 +127,7 @@ def main_loop(unused_arg):
           pi_learning_rate=0.1,
           num_critic_before_pi=3)
     elif FLAGS.algorithm == "dqn": 
-      agent = dqn.DQN(
+      agent = dqn.DQN( #DQN = Deep Q learning 
           sess,
           player_id=0,
           state_representation_size=info_state_size,
@@ -189,15 +207,15 @@ def main_loop(unused_arg):
       if ep and ep % FLAGS.eval_every == 0:
         logging.info("-" * 80)
         logging.info("Episode %s", ep)
-        logging.info("Loss: %s", agent.loss)
-        avg_return = _eval_agent(env, agent,agent2, 100)
-        logging.info("Avg return: %s", avg_return)
+        # logging.info("Loss: %s", agent.loss)
+        # avg_return = _eval_agent(env, agent,agent2, 5)
+        # logging.info("Avg return: %s", avg_return)
         P1_averages.append(agent_output.probs[0]) #
         P2_averages.append(agent2_output.probs[0])
         print("player1 probability of action1: ",agent_output.probs[0])
         print("player2 probability of action2: ",agent2_output.probs[0])
     plt.axis('square')
-    plt.title("Adverse RL MatchingPennies")
+    plt.title("Policy Gradient self-play: "+plot_name)
     plt.xlabel('Player 1, probability of action 1')
     plt.ylabel('Player 2, probability of action 1')
     plt.axis([0, 1, 0, 1])

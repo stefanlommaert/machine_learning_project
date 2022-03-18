@@ -11,9 +11,17 @@ from matplotlib.quiver import Quiver
 import matplotlib.pyplot as plt
 
 
-plot_name = 'Battle of the sexes'
-row_player = [[3,0],[0,2]]
-vector_player = [[2,0],[0,3]]
+plot_name = 'Dispersion game'
+row_player = [[-1,1],[1,-1]]
+vector_player = [[-1,1],[1,-1]]
+
+# plot_name = 'matching pennies'
+# row_player = [[1,-1],[-1,1]]
+# vector_player = [[-1,1],[1,-1]]
+
+# plot_name = 'Battle of the sexes'
+# row_player = [[3,0],[0,2]]
+# vector_player = [[2,0],[0,3]]
 
 # plot_name = 'Subsidy game'
 # row_player = [[10,0],[11,12]]
@@ -31,7 +39,7 @@ c22 = vector_player[1][1]
 game = pyspiel.create_matrix_game(row_player, vector_player)
 
 payoff_tensor = game_payoffs_array(game)
-dyn = dynamics.MultiPopulationDynamics(payoff_tensor, dynamics.replicator)
+dyn = dynamics.MultiPopulationDynamics(payoff_tensor, dynamics.boltzmannq)
 
 fig = plt.figure(figsize=(4,4))
 ax = fig.add_subplot(111, projection="2x2") # schaal , keuze plot 

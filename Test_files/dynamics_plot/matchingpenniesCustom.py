@@ -14,7 +14,7 @@ print("loaded game")
 # convert game to matrix form if it isn't already a matrix game
 if not isinstance(game, pyspiel.MatrixGame):
  game = pyspiel.extensive_to_matrix_game(game)
- num_rows, num_cols = game.num_rows(), game.num_cols()
+ num_rows, num_cols = game.num_rows(), game.num_cols()  
  print("converted to matrix form with shape (%d, %d)" % (num_rows, num_cols))
 
 # use iterated dominance to reduce the space unless the solver is LP (fast)
@@ -25,11 +25,10 @@ row_actions = [game.row_action_name(row) for row in range(num_rows)]
 col_actions = [game.col_action_name(col) for col in range(num_cols)]
 row_payoffs, col_payoffs = game_payoffs_array(game)
 payoff_tensor= game_payoffs_array(game) 
-dyn = dynamics.MultiPopulationDynamics(payoff_tensor , dynamics.replicator) #kan ook boltzman Q learning doen
-
+#print("payoff_tensor",payoff_tensor)
+dyn = dynamics.MultiPopulationDynamics(payoff_tensor , (dynamics.lenient_boltzmannq,dynamics.lenient_boltzmannq) ) #kan ook boltzman Q learning doen #door er 2 te doen kunnen we mixed play tegen elkaar doen ! 
 X, Y = np.meshgrid(np.linspace(0.0, 1.0, 30), np.linspace(0.0, 1.0, 30))
-print(X)
-print(Y)
+
 u, v = np.zeros_like(X), np.zeros_like(X)
 NI, NJ = X.shape
 payoff_matrix = game_payoffs_array(game)
@@ -40,9 +39,9 @@ for i in range(NI):
         xChance = np.array([X[i, j], 1-X[i, j]])
         yChance = np.array([Y[i, j], 1-Y[i, j]])
         totalChance =np.concatenate((xChance,yChance))
-        print(totalChance)
+        #print(totalChance)
         changeTotalChance= dyn(totalChance)
-        
+    
         u[i,j] = changeTotalChance[0]
         v[i,j] = changeTotalChance[2]
         
