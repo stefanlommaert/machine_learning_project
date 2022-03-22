@@ -21,6 +21,7 @@ game = pyspiel.create_matrix_game(row_player, vector_player)
 
 payoff_tensor = game_payoffs_array(game)
 
+
 rewardsP1  =[0,0,0]
 countsP1   =[0,0,0] 
 averagerewardsP1 = [0,0,0]
