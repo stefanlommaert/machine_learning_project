@@ -16,7 +16,12 @@ vector_player = [[0, 0.25, -0.5], [-0.25, 0, 0.05], [0.5, -0.05, 0]]
 game = pyspiel.create_matrix_game(row_player, vector_player)
 payoff_tensor = game_payoffs_array(game)
 dyn = dynamics.SinglePopulationDynamics(payoff_tensor, dynamics.replicator)
-
+alpha = 0.01
+for i in range(1000000):
+    x = np.array([0.2, 0.2, 0.6])                   # population heavily-weighted toward scissors
+    dyn(x)
+    x += alpha * dyn(x)
+print(" x = ",x)    
 fig = plt.figure(figsize=(4,4))
 ax = fig.add_subplot(111, projection="3x3") #eerste nummer bepaald de schaal tegenover elkaar tweede welk soort plot je wilt (van openspiel)
 # res = ax.quiver(dyn)

@@ -38,7 +38,7 @@ import matplotlib
 
 FLAGS = flags.FLAGS
 flags.DEFINE_string("game", "matrix_pd", "Name of the game.") #WELKE GAME WILLEN WE TESTEN?
-flags.DEFINE_integer("num_episodes", int(1e5), "Number of train episodes.") #HOEVEEL ITERATIES?
+flags.DEFINE_integer("num_episodes", int(5e5), "Number of train episodes.") #HOEVEEL ITERATIES?
 flags.DEFINE_integer("eval_every", int(1e2), #HOEVAAK BENCHMARKS RUNNEN?
                      "How often to evaluate the policy.")
 flags.DEFINE_enum("algorithm", "a2c", ["dqn", "rpg", "qpg", "rm", "eva", "a2c"],
@@ -204,7 +204,7 @@ def main_loop(unused_arg):
         print("player1 probabilitys: ",agent_output.probs)
         print("player2 probabilitys: ",agent2_output.probs)
 
-  episodes= 100000
+  episodes= 500000
   fig, tax = ternary.figure(scale=100)
   fig.set_size_inches(10, 9)
 
@@ -216,9 +216,9 @@ def main_loop(unused_arg):
   # Axis labels. (See below for corner labels.)
   fontsize = 14
   offset = 0.08
-  tax.left_axis_label("Rock %", fontsize=fontsize, offset=offset)
+  tax.left_axis_label("Scissor %", fontsize=fontsize, offset=offset)
   tax.right_axis_label("Paper %", fontsize=fontsize, offset=offset)
-  tax.bottom_axis_label("Scissor %", fontsize=fontsize, offset=-offset)
+  tax.bottom_axis_label("Rock %", fontsize=fontsize, offset=-offset)
   tax.set_title("Policy Gradient RPS player 2, "+"episodes = "+str(episodes), fontsize=20)
 
   # Decoration.
@@ -254,9 +254,9 @@ def main_loop(unused_arg):
   # Axis labels. (See below for corner labels.)
   fontsize = 14
   offset = 0.08
-  tax_P1.left_axis_label("Rock %", fontsize=fontsize, offset=offset)
+  tax_P1.left_axis_label("Scissor %", fontsize=fontsize, offset=offset)
   tax_P1.right_axis_label("Paper %", fontsize=fontsize, offset=offset)
-  tax_P1.bottom_axis_label("Scissor %", fontsize=fontsize, offset=-offset)
+  tax_P1.bottom_axis_label("Rock %", fontsize=fontsize, offset=-offset)
   tax_P1.set_title("Policy Gradient RPS player 1, "+"episodes = "+str(episodes), fontsize=20)
 
   # Decoration.

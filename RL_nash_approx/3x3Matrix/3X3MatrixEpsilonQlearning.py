@@ -86,10 +86,10 @@ def P2exploit():
     
     # print(rockchanceP1,paperchanceP1,scissorchanceP1)
   
-    utility_action1 = vector_player[0][0]*rockchanceP1 + vector_player[0][1]*paperchanceP1 + vector_player[0][2]*scissorchanceP1 
+    utility_action1 = vector_player[0][0]*rockchanceP1 + vector_player[1][0]*paperchanceP1 + vector_player[2][0]*scissorchanceP1 
      
-    utility_action2 = vector_player[1][0]*rockchanceP1 + vector_player[1][1]*paperchanceP1 + vector_player[1][2]*scissorchanceP1 
-    utility_action3 = vector_player[2][0]*rockchanceP1 + vector_player[2][1]*paperchanceP1 + vector_player[2][2]*scissorchanceP1
+    utility_action2 = vector_player[0][1]*rockchanceP1 + vector_player[1][1]*paperchanceP1 + vector_player[2][1]*scissorchanceP1 
+    utility_action3 = vector_player[0][2]*rockchanceP1 + vector_player[1][2]*paperchanceP1 + vector_player[2][2]*scissorchanceP1
     all_actions= [utility_action1, utility_action2, utility_action3] #TODO: hier klopt iets niet nu is het 
     print("all_actions: ",all_actions)   
     return (all_actions.index(max(all_actions)))
@@ -124,10 +124,12 @@ def play_game(i):
     print("Player 1 rewards: ",rewardsP1)
     print("Player 1 counts:  ",countsP1) 
     print("Player 1 average rewards: ",averagerewardsP1)
-
+    print("player 1 chance action1: ", np.array(countsP1)/float(sum(countsP1)))
+    
     print("Player 2 rewards: ",rewardsP2)
     print("Player 2 counts:  ",countsP2) 
     print("Player 2 average rewards: ",averagerewardsP2)
+    print("player 2 chance action1: ", np.array(countsP2)/float(sum(countsP2)))
        
         
 episodes = 1000000

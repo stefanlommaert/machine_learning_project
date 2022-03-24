@@ -104,8 +104,8 @@ def P2exploit():
     r12 = vector_player[0][1]
     r21 = vector_player[1][0]
     r22 = vector_player[1][1]
-    utility_action1 = r11*(alpha)+r12*(1-alpha)
-    utility_action2 = r21*alpha + r22*(1-alpha)
+    utility_action1 = r11*(alpha)+r21*(1-alpha) #want r(i,j) met j de keuzen va player 2
+    utility_action2 = r12*(alpha)+r22*(1-alpha)
      
     return (0 if (utility_action1>utility_action2) else 1)
 

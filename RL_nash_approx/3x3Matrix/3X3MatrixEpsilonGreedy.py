@@ -30,15 +30,15 @@ rewardsP2  = [0,0,0]
 countsP2   = [0,0,0] 
 averagerewardsP2= [0,0,0]
 
-
+episodes = 1000000
 def P1explore():
     return random.choice(options)
 
 def P1exploit():
     return averagerewardsP1.index(max(averagerewardsP1))
 
-def P1_select_action():
-    if (random.random()<epsilon):
+def P1_select_action(episode):
+    if (random.random()<(epsilon*np.exp(-5*episode/episodes))):
         return P1explore()
     else:
         return P1exploit()
@@ -49,8 +49,8 @@ def P2explore():
 def P2exploit():
     return averagerewardsP2.index(max(averagerewardsP2))
 
-def P2_select_action():
-    if (random.random()<epsilon):
+def P2_select_action(episode):
+    if ((random.random()<(epsilon*np.exp(-5*episode/episodes)))):
         return P2explore()
     else:
         return P2exploit()
@@ -72,28 +72,31 @@ P1_averages=[]
 P2_averages=[]
 measurement_stepsize=10
 def play_game(i):
+    episode = 0
     for x in range(i):
-        p1action = P1_select_action()
-        p2action = P2_select_action()
+        p1action = P1_select_action(episode )
+        p2action = P2_select_action(episode)
         update(p1action, p2action)
       
         if ((x%measurement_stepsize)==0 and (x>measurement_stepsize)):
             P1_averages.append(np.array(countsP1)/float(sum(countsP1)))
             
             P2_averages.append(np.array(countsP2)/float(sum(countsP2)))
-            
+        episode +=1       
             
     
     print("Player 1 rewards: ",rewardsP1)
     print("Player 1 counts:  ",countsP1) 
     print("Player 1 average rewards: ",averagerewardsP1)
-
+    print("player 1 chance action1: ", np.array(countsP1)/float(sum(countsP1)))
+    
     print("Player 2 rewards: ",rewardsP2)
     print("Player 2 counts:  ",countsP2) 
     print("Player 2 average rewards: ",averagerewardsP2)
+    print("player 2 chance action1: ", np.array(countsP2)/float(sum(countsP2)))
        
         
-episodes = 1000000
+
 play_game(episodes)
 
 fig, tax = ternary.figure(scale=100)
