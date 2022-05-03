@@ -110,9 +110,9 @@ tax.plot_colored_trajectory(points, cmap="hsv", linewidth=2.0)
 # Axis labels. (See below for corner labels.)
 fontsize = 14
 offset = 0.08
-tax.left_axis_label("Rock %", fontsize=fontsize, offset=offset)
+tax.left_axis_label("Scissor %", fontsize=fontsize, offset=offset)
 tax.right_axis_label("Paper %", fontsize=fontsize, offset=offset)
-tax.bottom_axis_label("Scissor %", fontsize=fontsize, offset=-offset)
+tax.bottom_axis_label("Rock %", fontsize=fontsize, offset=-offset)
 tax.set_title("Greedy epsilon RPS player 2, "+"episodes = "+str(episodes), fontsize=20)
 
 # Decoration.
@@ -148,9 +148,9 @@ tax_P1.plot_colored_trajectory(points, cmap="hsv", linewidth=2.0)
 # Axis labels. (See below for corner labels.)
 fontsize = 14
 offset = 0.08
-tax_P1.left_axis_label("Rock %", fontsize=fontsize, offset=offset)
+tax_P1.left_axis_label("Scissor %", fontsize=fontsize, offset=offset)
 tax_P1.right_axis_label("Paper %", fontsize=fontsize, offset=offset)
-tax_P1.bottom_axis_label("Scissor %", fontsize=fontsize, offset=-offset)
+tax_P1.bottom_axis_label("Rock %", fontsize=fontsize, offset=-offset)
 tax_P1.set_title("Greedy epsilon RPS player 1, "+"episodes = "+str(episodes), fontsize=20)
 
 # Decoration.

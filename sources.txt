@@ -1,7 +1,17 @@
-video openspiel: https://www.youtube.com/watch?v=YE0E0F39lac
-replicator dynamics: http://systems-sciences.uni-graz.at/etextbook/gametheory/replicator.html
-Nash Convergence of Gradient Dynamics in Iterated General-Sum Games: https://arxiv.org/pdf/1301.3892.pdf
-openspiel doc: https://arxiv.org/pdf/1908.09453.pdf
-openspiel API: https://github.com/deepmind/open_spiel/blob/master/open_spiel/python/pybind11/pyspiel.cc
-boltzman paper: http://michaelkaisers.com/publications/2010_BNAIC_Bloembergen_2x2.pdf
-Lenient Q learning: http://www.flowermountains.nl/pub/Bloembergen2010lfaq.pdf echte GOAT paper 
+1. Nash Eq with replicator dynamics
+            video openspiel: https://www.youtube.com/watch?v=YE0E0F39lac
+            replicator dynamics: http://systems-sciences.uni-graz.at/etextbook/gametheory/replicator.html
+            Nash Convergence of Gradient Dynamics in Iterated General-Sum Games: https://arxiv.org/pdf/1301.3892.pdf
+            openspiel doc: https://arxiv.org/pdf/1908.09453.pdf
+            openspiel API: https://github.com/deepmind/open_spiel/blob/master/open_spiel/python/pybind11/pyspiel.cc
+            boltzman paper: http://michaelkaisers.com/publications/2010_BNAIC_Bloembergen_2x2.pdf
+            Lenient Q learning: http://www.flowermountains.nl/pub/Bloembergen2010lfaq.pdf echte GOAT paper
+
+2. Khun Poker
+			Nash_conv openspiel Julia: https://juliareinforcementlearning.org/blog/ospp_report_210370190/#11_schedule 
+ 			ED paper: https://arxiv.org/pdf/1903.05614.pdf
+            Open_spiel Documentation paper (entire section discussing khun poker nash_conv):  https://arxiv.org/pdf/1908.09453.pdf 
+            Examples build into open_spiel …
+
+
+3. FCPA poker  
