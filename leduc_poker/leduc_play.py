@@ -26,8 +26,8 @@ from open_spiel.python.bots import human
 from open_spiel.python.bots import uniform_random
 
 from absl import app
-from open_spiel.python.algorithms import exploitability
-from open_spiel.python.algorithms import external_sampling_mccfr
+
+
 
 import pyspiel
 
@@ -71,16 +71,7 @@ def main(_):
   # See here:
   # https://github.com/deepmind/open_spiel/blob/master/docs/install.md#configuration-conditional-dependencies
   # for more details on optional dependencies.
-  games_list = pyspiel.registered_names()
-  for game in games_list:
-      print (game)
-      
-  assert "universal_poker" in games_list
 
-  fcpa_game_string = (
-        "universal_poker(betting=nolimit,numPlayers=2,numRounds=1,blind=150 100,"
-        "firstPlayer=2 1 1 1,numSuits=1,numRanks=13,numHoleCards=2,numBoardCards=0 3 1 1,"
-        "stack=20000 20000,bettingAbstraction=fcpa)")
   print("Creating game: {}".format("Leduc_Poker"))
   game = pyspiel.load_game("leduc_poker")
 
@@ -92,10 +83,12 @@ def main(_):
   
 
   # Print the initial state
-  print("INITIAL STATE")
-  print(str(state))
+ 
   while True: 
-    state = game.new_initial_state()
+    state = game.new_initial_state() 
+    print("NEW GAME:")
+    print("INITIAL STATE")
+    print(str(state))
     while not state.is_terminal():
         # The state can be three different types: chance node,
         # simultaneous node, or decision node

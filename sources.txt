@@ -11,6 +11,8 @@
 			Nash_conv openspiel Julia: https://juliareinforcementlearning.org/blog/ospp_report_210370190/#11_schedule 
  			ED paper: https://arxiv.org/pdf/1903.05614.pdf
             Open_spiel Documentation paper (entire section discussing khun poker nash_conv):  https://arxiv.org/pdf/1908.09453.pdf 
+            YT video Khun poker CFR = https://www.youtube.com/watch?v=Qz3kSJv_9mE 
+            
             Examples build into open_spiel …
 
 
