@@ -21,6 +21,7 @@ from __future__ import print_function
 import time
 
 from absl import app
+import numpy as np
 
 from open_spiel.python.algorithms import expected_game_score
 from open_spiel.python.algorithms import exploitability
@@ -52,12 +53,8 @@ def main(_):
     print("TOOK: ",end-start)
    
     
-    print("Trying to fetch infostates")
-    average_policy = es_solver.average_policy()._infostates
-    print("feteched infostates")
-    print(average_policy)
-    
-   
+    print("Trying to save infostates")
+    np.save('FCPA_poker/FCPA_tournament/fcpa_agent/infostates/full_fpca_agent_infostats.npy', es_solver.average_policy()._infostates)   
 
     
     
