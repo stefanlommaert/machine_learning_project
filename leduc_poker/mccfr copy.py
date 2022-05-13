@@ -41,6 +41,7 @@ def main(_):
     #print("type: ", type(es_solver.average_policy))
     
     #Save the policy (or atleast the most important part )
+    np.save('leduc_poker/leduc_agent_infostats.npy', es_solver.average_policy()._infostates)
     d2=np.load("leduc_poker/leduc_agent_infostats.npy",allow_pickle=True) #allow the magic pickle
     #load the policy back in 
     print(d2[()])

@@ -1,4 +1,3 @@
-
 # Copyright 2019 DeepMind Technologies Limited
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,36 +30,33 @@ import pyspiel
 
 def main(_):
     fcpa_game_string = (
-        "universal_poker(betting=nolimit,numPlayers=2,numRounds=4,blind=150 100,"
-        "firstPlayer=2 1 1 1,numSuits=4,numRanks=13,numHoleCards=2,numBoardCards=0 3 1 1,"
-        "stack=20000 20000,bettingAbstraction=fcpa)")
+        "universal_poker(betting=nolimit,numPlayers=2,numRounds=2,blind=3 2,"
+        "firstPlayer=2 1 1 1,numSuits=1,numRanks=13,numHoleCards=2,numBoardCards=0 3 1 1,"
+        "stack=400 400,bettingAbstraction=fcpa)")
     game = pyspiel.load_game(fcpa_game_string)
-    print("GOT HERE")
     es_solver = external_sampling_mccfr.ExternalSamplingSolver(
     game, external_sampling_mccfr.AverageType.SIMPLE)
-    start = time.time()
-    print("STARTING ITERATION: ")
     
-    for i in range(10000):
-        print('episode :',i )
+    start = time.time()
+    
+    for _ in range(1):
         es_solver.iteration()
     end = time.time()
-    print("ENDING ITERATION: ")
-    
+   
+    conv = exploitability.nash_conv(game, es_solver.average_policy())
    
     
     print("TOOK: ",end-start)
-   
+    print("KUHN, conv = {}".format(conv))
     
-    print("Trying to fetch infostates")
-    average_policy = es_solver.average_policy()._infostates
-    print("feteched infostates")
-    print(average_policy)
-    
+    print("Iteration {} exploitability {}".format(10, conv))
+
+    average_policy = es_solver.average_policy()
+     
+    average_policy_values = expected_game_score.policy_value(
+    game.new_initial_state(), [average_policy] * 2)
    
 
+    print("Computed player 0 value: {}".format(average_policy_values[0]))
     
-    
-
-if __name__ == "__main__":
-  app.run(main)
+main("suck ma dick twice")
