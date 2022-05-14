@@ -4,7 +4,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 import fcpa_random_agent as ra
-import fcpa_agent as fa
+import FCPA_agent_pre as fa
 import numpy as np
 
 
@@ -48,7 +48,15 @@ def main():
         "firstPlayer=2 1 1 1,numSuits=4,numRanks=13,numHoleCards=2,numBoardCards=0 3 1 1,"
         "stack=20000 20000,bettingAbstraction=fcpa)")
   game = pyspiel.load_game(fcpa_game_string)
-  print(evaluate_bots(game.new_initial_state(), bots, np.random))
+  first_player_total=0
+  second_player_total=0
+  for i in range(200):
+      returns = evaluate_bots(game.new_initial_state(), bots, np.random)
+      first_player_total+=returns[0]
+      second_player_total+=returns[1]
+      print("Iteration: ",i," Returns: ",returns)
+  print("First player RETURNS 200 games: ",first_player_total/200)
+  print("Second player RETURNS 200 games : ",second_player_total/200)    
 
 if __name__ == "__main__":
   main()
