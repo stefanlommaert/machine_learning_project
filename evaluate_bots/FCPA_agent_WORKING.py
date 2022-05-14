@@ -58,7 +58,15 @@ class Agent(pyspiel.Bot):
         self.state= state
 
     def inform_action(self, state, player_id, action):
-     
+        
+        
+        if player_id==0:
+            print("OPPONENT PLAYED :",state.action_to_string(0, action).split(' ')[1][5:])     
+        elif player_id==1:
+            print("MEYYYY WTF??????")   
+        else:
+            print("CARD DEALD")      
+        
         self.state= state
         
     def get_cards(self,info_key):
@@ -71,17 +79,22 @@ class Agent(pyspiel.Bot):
         return "[Private: "+privcards+"][Public: "+pubcards+"]"+actionsstring
         
     def step(self, state):
-        print("STATE: ",state)
+        print()
+        print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
+        print("START OUR AGENT TURN: ")
+        
         cur_player = state.current_player()
 
         info_state_key = external_sampling_mccfr.simplify_info_key_fcpa(cur_player,self.state) 
+        info_key = state.information_state_string(cur_player) 
         cards = self.get_cards(info_state_key)
         legal_actions = state.legal_actions()
         num_legal_actions = len(legal_actions)
         
         privcards = cards[:2]
         pubcards = cards[2:]
-        print("INFO STATE: "+info_state_key)
+        print("TOTAL INFO_STATE: ",info_key)
+        print("INFO STATE: ",info_state_key)
         
         all_subcards=[]
         if len(pubcards)<=3:
@@ -96,6 +109,8 @@ class Agent(pyspiel.Bot):
             for action in legal_actions:
                 print(state.action_to_string(cur_player, action).split(' ')[1][5:]+" : ",policy[pol_indx])
                 pol_indx+=1
+            print("END OUR AGENT TURN")
+            print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")       
             return legal_actions[action_idx]
         actionString = "[Actions: "
         for action in legal_actions:
@@ -118,9 +133,11 @@ class Agent(pyspiel.Bot):
         #go over all subentries of 3 cards to find the action with the highest probability (with the assumption that the highest probability will probility be a good option (a pair for example)).
         policys=[]
         maxes = []
+        sub_keys=[]
         print("ALL SUBCARDS: ",all_subcards)
         for subcards in all_subcards:
             sub_info_key =  self.create_valid_info_key(privcards,subcards,actionString)  
+            sub_keys.append(sub_info_key)
             print("SUBINFO KEY: ",sub_info_key) 
             infostate_info = self.solver._lookup_infostate_info(sub_info_key,
                                                     num_legal_actions)
@@ -132,13 +149,17 @@ class Agent(pyspiel.Bot):
         
         #choose the policy with a maximum chance      
         bestpolicy= policys[maxes.index((max(maxes)))]
-      
+        best_key= sub_keys[maxes.index((max(maxes)))]
         action_idx = np.random.choice(np.arange(num_legal_actions), p=bestpolicy)
+        
         print("CHOSE ACTION: ",state.action_to_string(cur_player, legal_actions[action_idx]).split(' ')[1][5:]," WITH ACTIONPROBABILITIES:")
         pol_indx=0
         for action in legal_actions:
             print(state.action_to_string(cur_player, action).split(' ')[1][5:]+" : ", bestpolicy[pol_indx])
             pol_indx+=1
+        print("END OUR AGENT TURN")
+        print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––") 
+        print()   
         return legal_actions[action_idx]
      
                  

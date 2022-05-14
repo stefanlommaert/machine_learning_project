@@ -4,7 +4,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 import fcpa_random_agent as ra
-import FCPA_agent_pre as fa
+import FCPA_agent_WORKING as fa
 import numpy as np
 
 
