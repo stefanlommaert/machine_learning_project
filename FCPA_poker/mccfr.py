@@ -76,7 +76,7 @@ def main(_):
         if not (actions in different_action_abstractions):
             different_action_abstractions.append(actions)    
    
-    print("ALL CARD COMBINATIONS: =",different_card_abstractions)
+    #print("ALL CARD COMBINATIONS: =",different_card_abstractions)
     print("AMOUNT of CARD COMBINATIONS: =",len(different_card_abstractions))
     
     print("ALL ACTION COMBINATIONS: =",different_action_abstractions)    
