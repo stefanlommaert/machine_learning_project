@@ -60,33 +60,31 @@ def main(_):
     end = time.time()
     print("ENDING ITERATION: ")
     
-   
-   
-    different_action_abstractions= []
-    different_card_abstractions=[]
-    print("Trying to save infostates")
-    #np.save('FCPA_poker/FCPA_tournament/fcpa_agent/infostates/full_fpca_agent_infostats.npy', es_solver.average_policy()._infostates) 
-    print("saved infostates")    
-    for key in es_solver.average_policy()._infostates:
-        cards= ""
-        #op één of andere reden is er geen copy voor strings en moet je dit doen #nicePython
-        actions= (key + '.')[:-1]
+    # different_action_abstractions= []
+    # different_card_abstractions=[]
+    # print("Trying to save infostates")
+    # #np.save('FCPA_poker/FCPA_tournament/fcpa_agent/infostates/full_fpca_agent_infostats.npy', es_solver.average_policy()._infostates) 
+    # print("saved infostates")    
+    # for key in es_solver.average_policy()._infostates:
+    #     cards= ""
+    #     #op één of andere reden is er geen copy voor strings en moet je dit doen #nicePython
+    #     actions= (key + '.')[:-1]
         
-        for i in range(2):
-            rounds = find_between(actions,"[","]") 
-            actions=actions.replace(rounds,"")
-            cards=cards+rounds
-        if not ( cards in different_card_abstractions):
-            different_card_abstractions.append(cards)
-        if not (actions in different_action_abstractions):
-            different_action_abstractions.append(actions)    
+    #     for i in range(2):
+    #         rounds = find_between(actions,"[","]") 
+    #         actions=actions.replace(rounds,"")
+    #         cards=cards+rounds
+    #     if not ( cards in different_card_abstractions):
+    #         different_card_abstractions.append(cards)
+    #     if not (actions in different_action_abstractions):
+    #         different_action_abstractions.append(actions)    
    
-    print("ALL CARD COMBINATIONS: =",different_card_abstractions)
-    print("AMOUNT of CARD COMBINATIONS: =",len(different_card_abstractions))
+    # print("ALL CARD COMBINATIONS: =",different_card_abstractions)
+    # print("AMOUNT of CARD COMBINATIONS: =",len(different_card_abstractions))
     
-    print("ALL ACTION COMBINATIONS: =",different_action_abstractions)    
-    print("AMOUNT OF ACTION COMBINATIONS: =",len(different_action_abstractions))
-    print("AMOUNT OF STATES IN POLICY: ",len(es_solver.average_policy()._infostates))
+    # print("ALL ACTION COMBINATIONS: =",different_action_abstractions)    
+    # print("AMOUNT OF ACTION COMBINATIONS: =",len(different_action_abstractions))
+    # print("AMOUNT OF STATES IN POLICY: ",len(es_solver.average_policy()._infostates))
     print("TOOK: ",end-start)
    
 

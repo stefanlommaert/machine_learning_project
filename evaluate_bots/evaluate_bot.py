@@ -50,7 +50,7 @@ def main():
   game = pyspiel.load_game(fcpa_game_string)
   first_player_total=0
   second_player_total=0
-  for i in range(200):
+  for i in range(2000):
       returns = evaluate_bots(game.new_initial_state(), bots, np.random)
       first_player_total+=returns[0]
       second_player_total+=returns[1]

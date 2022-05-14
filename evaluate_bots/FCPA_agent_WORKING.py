@@ -33,7 +33,52 @@ def get_agent_for_tournament(player_id):
     my_player = Agent(player_id)
     return my_player
 
-
+def find_between( s, first, last ):
+      try:
+        start = s.index( first ) + len( first )
+        end = s.index( last, start )
+        return s[start-1:end+1]
+      except ValueError:
+        return ""
+def simplify_info_key_fcpa(cur_player,state):
+    # example [Round 0][Player: 0][Pot: 40000][Money: 19850 0][Private: TsTd][Public: ][Sequences: r20000]
+    #to [Private: TT][Public: ]  
+    #delete rounds player pot money
+    info_key = state.information_state_string(cur_player) 
+    legal_actions = state.legal_actions()
+    
+    #what actions are available 
+    actionString = "[Actions: "
+    for action in legal_actions:
+      
+        actionString += state.action_to_string(cur_player, action).split(' ')[1][5:]
+        
+    actionString += "]"    
+    
+    for i in range(4):
+      rounds = find_between(info_key,"[","]") 
+      info_key=info_key.replace(rounds,"",1)
+    newer_key="" 
+    #save private and public
+    for i in range(2):
+      rounds = find_between(info_key,"[","]") 
+      info_key=info_key.replace(rounds,"",1)  
+      rounds = simplify_card_string(rounds)
+      newer_key+=rounds
+    return newer_key+actionString
+def simplify_card_string(cards):
+      splitted = cards.split(": ")
+      cards= splitted[1][:-1]
+      pre  = splitted[0][1:] 
+      newcards=""
+      for i in range(0,len(cards),2):
+            card = cards[i]
+            newcards+=card  
+      return "["+pre+": "+newcards+"]"    
+            
+            
+      
+    
 
       
 class Agent(pyspiel.Bot):
@@ -48,12 +93,12 @@ class Agent(pyspiel.Bot):
         self.game = pyspiel.load_game(fcpa_game_string)
         self.infostates=np.load("FCPA_poker/FCPA_tournament/fcpa_agent/infostates/full_fpca_agent_infostats.npy",allow_pickle=True)[()] #allow the magic pickle
         self.state= self.game.new_initial_state()
-        
-        self.average_policy = mccfr.AveragePolicy(self.game, list(range(self.game.num_players())),
-                            self.infostates)
+       
         self.solver = external_sampling_mccfr.ExternalSamplingSolver(
                     self.game, external_sampling_mccfr.AverageType.SIMPLE)
         self.solver._infostates= self.infostates
+        
+        self.average_policy   = self.solver.average_policy()
     def restart_at(self, state):
         self.state= state
 
@@ -71,13 +116,24 @@ class Agent(pyspiel.Bot):
         
     def get_cards(self,info_key):
         #wss 2 en 1 index want zo werkt splits i guess 
-        pubcards= info_key.split("]")[1].replace("[Public: ","")
-        privcards= info_key.split("]")[0].replace("[Private: ","") 
+        pubcards= info_key.split("]")[1].replace("[Public: ","",1)
+        privcards= info_key.split("]")[0].replace("[Private: ","",1) 
         
         return privcards+pubcards 
     def create_valid_info_key(self,privcards,pubcards,actionsstring):
         return "[Private: "+privcards+"][Public: "+pubcards+"]"+actionsstring
+    
+    def get_average_probabilities(self,info_key,state):
         
+        legal_actions = state.legal_actions()
+        retrieved_infostate = self.solver._infostates.get(info_key, None)
+        if retrieved_infostate is None:
+            return {a: 1 / len(legal_actions) for a in legal_actions}
+        avstrat = (
+            retrieved_infostate[mccfr.AVG_POLICY_INDEX] /
+            retrieved_infostate[mccfr.AVG_POLICY_INDEX].sum())
+        return {legal_actions[i]: avstrat[i] for i in range(len(legal_actions))}   
+    
     def step(self, state):
         print()
         print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
@@ -85,7 +141,7 @@ class Agent(pyspiel.Bot):
         
         cur_player = state.current_player()
 
-        info_state_key = external_sampling_mccfr.simplify_info_key_fcpa(cur_player,self.state) 
+        info_state_key = simplify_info_key_fcpa(cur_player,self.state) 
         info_key = state.information_state_string(cur_player) 
         cards = self.get_cards(info_state_key)
         legal_actions = state.legal_actions()
@@ -98,20 +154,26 @@ class Agent(pyspiel.Bot):
         
         all_subcards=[]
         if len(pubcards)<=3:
-            infostate_info = self.solver._lookup_infostate_info(info_state_key,
-                                                    num_legal_actions)
-            policy = self.solver._regret_matching(infostate_info[mccfr.REGRET_INDEX],
-                                    num_legal_actions)
-           
-            action_idx = np.random.choice(np.arange(num_legal_actions), p=policy)
-            print("CHOSE ACTION: ",state.action_to_string(cur_player, legal_actions[action_idx]).split(' ')[1][5:]," WITH ACTIONPROBABILITIES:")
+            chances= []
+            actions= []
+            act_prob= self.get_average_probabilities(info_state_key,state) 
+            
+            for action in  act_prob:
+                chance =  act_prob[action]
+                chances.append(chance)
+                actions.append(action)
+                
+                 
+            chosen_action = np.random.choice(np.array(actions), p=np.array(chances))
+            print("POLICY == ",np.array(chances))
+            print("CHOSE ACTION: ",state.action_to_string(cur_player, chosen_action).split(' ')[1][5:]," WITH ACTIONPROBABILITIES:")
             pol_indx=0
-            for action in legal_actions:
-                print(state.action_to_string(cur_player, action).split(' ')[1][5:]+" : ",policy[pol_indx])
+            for action in actions:
+                print(state.action_to_string(cur_player, action).split(' ')[1][5:]+" : ",np.array(chances)[pol_indx])
                 pol_indx+=1
             print("END OUR AGENT TURN")
             print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")       
-            return legal_actions[action_idx]
+            return chosen_action
         actionString = "[Actions: "
         for action in legal_actions:
             actionString += state.action_to_string(cur_player, action).split(' ')[1][5:] 
@@ -119,40 +181,59 @@ class Agent(pyspiel.Bot):
         if (len(pubcards)==4):
             #4 public cards
             for i in range(len(pubcards)):    
-                all_subcards.append(pubcards.replace(pubcards[i],""))
+                all_subcards.append(pubcards.replace(pubcards[i],"",1))
                 
                 
         else:
             #5 public cards  
-            
             for i in range(len(pubcards)):    
                 first=i
                 second= (i+1)//len(pubcards)
-                newstring= pubcards.replace(pubcards[first],"")
-                all_subcards.append(newstring.replace(pubcards[second],""))
-        #go over all subentries of 3 cards to find the action with the highest probability (with the assumption that the highest probability will probility be a good option (a pair for example)).
+                newstring= pubcards.replace(pubcards[first],"",1)
+                all_subcards.append(newstring.replace(pubcards[second],"",1))
+        
         policys=[]
         maxes = []
         sub_keys=[]
         print("ALL SUBCARDS: ",all_subcards)
         for subcards in all_subcards:
+            value=0
+
+            print()
             sub_info_key =  self.create_valid_info_key(privcards,subcards,actionString)  
             sub_keys.append(sub_info_key)
             print("SUBINFO KEY: ",sub_info_key) 
-            infostate_info = self.solver._lookup_infostate_info(sub_info_key,
-                                                    num_legal_actions)
-            policy = self.solver._regret_matching(infostate_info[mccfr.REGRET_INDEX],
-                                    num_legal_actions)
+            act_prob= self.get_average_probabilities(sub_info_key,state)
+            
+            chances=[]
+            actions=[] 
+            for action in  act_prob:
+                chance =  act_prob[action]
+                chances.append(chance)
+                actions.append(action)
+            policy=np.array(chances)
             
             policys.append(policy)
-            maxes.append(np.amax(policy))
+            #selection metric select on highest average regret if the policy is played out 
+            for idx in range(num_legal_actions):
+                infos=self.solver._lookup_infostate_info(sub_info_key,num_legal_actions) 
+                avret = infos[mccfr.REGRET_INDEX][idx]*policy[idx]
+                value+=avret
+            value= value/infos[mccfr.AVG_POLICY_INDEX].sum()        
+           
+            print("WITh A VALUE OF: ",value)
+            print("WITH POLICY: ",policy)
+            print()
+            maxes.append(value)
         
         #choose the policy with a maximum chance      
         bestpolicy= policys[maxes.index((max(maxes)))]
         best_key= sub_keys[maxes.index((max(maxes)))]
-        action_idx = np.random.choice(np.arange(num_legal_actions), p=bestpolicy)
+        chosen_action = np.random.choice(np.array(actions), p=np.array(chances))
         
-        print("CHOSE ACTION: ",state.action_to_string(cur_player, legal_actions[action_idx]).split(' ')[1][5:]," WITH ACTIONPROBABILITIES:")
+        print("BEST SUBKEY: ",best_key)
+        print("CHOSE ACTION: ",state.action_to_string(cur_player, chosen_action).split(' ')[1][5:]," WITH ACTIONPROBABILITIES:")
+        
         pol_indx=0
         for action in legal_actions:
             print(state.action_to_string(cur_player, action).split(' ')[1][5:]+" : ", bestpolicy[pol_indx])
@@ -160,7 +241,7 @@ class Agent(pyspiel.Bot):
         print("END OUR AGENT TURN")
         print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––") 
         print()   
-        return legal_actions[action_idx]
+        return chosen_action
      
                  
            
