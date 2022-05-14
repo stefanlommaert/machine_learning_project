@@ -80,7 +80,7 @@ def main(_):
       LoadAgent(FLAGS.player1, game, 1, rng)
   ]
 
-  
+    
 
   # Print the initial state
  

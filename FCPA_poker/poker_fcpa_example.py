@@ -31,7 +31,7 @@ FLAGS = flags.FLAGS
 flags.DEFINE_integer("seed", 12763391, "The seed to use for the RNG.")
 
 # Supported types of players: "random", "human", "check_call", "fold"
-flags.DEFINE_string("player0", "check_call", "check_call")
+flags.DEFINE_string("player0", "human", "check_call")
 flags.DEFINE_string("player1", "check_call", "check_call")
 
 
@@ -62,9 +62,10 @@ def main(_):
   # for more details on optional dependencies.
   games_list = pyspiel.registered_names()
   assert "universal_poker" in games_list
-
+  #bot moet altijd callen na de 2de ronde
+  
   fcpa_game_string = (
-        "universal_poker(betting=nolimit,numPlayers=2,numRounds=1,blind=150 100,"
+        "universal_poker(betting=nolimit,numPlayers=2,numRounds=4,blind=150 100,"
         "firstPlayer=2 1 1 1,numSuits=1,numRanks=13,numHoleCards=2,numBoardCards=0 3 1 1,"
         "stack=20000 20000,bettingAbstraction=fcpa)")
   print("Creating game: {}".format(fcpa_game_string))

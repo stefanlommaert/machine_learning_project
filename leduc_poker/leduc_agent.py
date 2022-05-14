@@ -12,6 +12,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 import random
+import numpy as np
 
 
 
@@ -42,7 +43,7 @@ class Agent(pyspiel.Bot):
         self.player_id = player_id
         self.game = pyspiel.load_game("leduc_poker")
         self.es_solver = external_sampling_mccfr.ExternalSamplingSolver(
-        self.game, external_sampling_mccfr.AverageType.SIMPLE)
+        self.game, external_sampling_mccfr.AverageType.Simple)
         for _ in range(1000):
             self.es_solver.iteration()
         conv = exploitability.nash_conv(self.game, self.es_solver.average_policy())
@@ -50,6 +51,7 @@ class Agent(pyspiel.Bot):
         self.state= self.game.new_initial_state()
         print("Iteration {} exploitability {}".format(10, conv))
         self.average_policy = self.es_solver.average_policy()
+        np.save('leduc_poker/leduc_agent_infostats.npy', self.average_policy._infostates)
 
     def restart_at(self, state):
         self.state= state

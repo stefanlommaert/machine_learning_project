@@ -37,10 +37,13 @@ def main(_):
     cfr_value = cfr_solver.evaluate_and_update_policy()
     conv = pyspiel.exploitability(game, cfr_solver.ComputeAveragePolicy())
       
-    print("Iteration {} exploitability {}".format(i, conv))
-    print("Game util at iteration {}: {}".format(i, cfr_value))
+    # print("Iteration {} exploitability {}".format(i, conv))
+    # print("Game util at iteration {}: {}".format(i, cfr_value))
 
   average_policy = cfr_solver.average_policy()
+  aveve =  cfr_solver.ComputeAveragePolicy()
+  print('type: ',type(aveve))
+  
   average_policy_values = expected_game_score.policy_value(
       game.new_initial_state(), [average_policy] * 2)
   print("Computed player 0 value: {}".format(average_policy_values[0]))
