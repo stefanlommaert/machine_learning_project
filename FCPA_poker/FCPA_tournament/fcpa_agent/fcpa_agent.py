@@ -10,6 +10,7 @@ Copyright (c) 2021 KU Leuven. All rights reserved.
 """
 
 import sys
+import random
 import argparse
 import logging
 import numpy as np
@@ -50,7 +51,7 @@ class Agent(pyspiel.Bot):
 
         :param state: The initial state of the game.
         """
-        pass
+        self.state = state
 
     def inform_action(self, state, player_id, action):
         """Let the bot know of the other agent's actions.
@@ -59,7 +60,7 @@ class Agent(pyspiel.Bot):
         :param player_id: The ID of the player that executed an action.
         :param action: The action which the player executed.
         """
-        pass
+        self.state = state
 
     def step(self, state):
         """Returns the selected action in the given state.
@@ -68,7 +69,11 @@ class Agent(pyspiel.Bot):
         :returns: The selected action from the legal actions, or
             `pyspiel.INVALID_ACTION` if there are no legal actions available.
         """
-        pass
+        legal_actions = state.legal_actions()
+        if len(legal_actions)==0:
+            return pyspiel.INVALID_ACTION
+        else:
+            return random.choice(legal_actions)
 
 
 def test_api_calls():
