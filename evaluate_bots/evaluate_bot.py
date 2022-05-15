@@ -50,13 +50,24 @@ def main():
   game = pyspiel.load_game(fcpa_game_string)
   first_player_total=0
   second_player_total=0
-  for i in range(2000):
+  scoreplayer0= 0
+  scoreplayer1= 0
+  
+  amount_of_games=200
+  for i in range(amount_of_games):
       returns = evaluate_bots(game.new_initial_state(), bots, np.random)
       first_player_total+=returns[0]
       second_player_total+=returns[1]
+      if returns[0]>=returns[1]:
+            scoreplayer0+=1
+      else:
+            scoreplayer1+=1
+                  
       print("Iteration: ",i," Returns: ",returns)
-  print("First player RETURNS 200 games: ",first_player_total/200)
-  print("Second player RETURNS 200 games : ",second_player_total/200)    
-
+  print("First player RETURNS 200 games: ",first_player_total)
+  print("Second player RETURNS 200 games : ",second_player_total)    
+  print("gamescore of bot 0 : ",scoreplayer0,"/",amount_of_games)
+  print("gamescore of bot 1 : ",scoreplayer1,"/",amount_of_games)
+  
 if __name__ == "__main__":
   main()
