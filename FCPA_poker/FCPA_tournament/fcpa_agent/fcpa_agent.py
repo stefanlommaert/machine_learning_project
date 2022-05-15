@@ -10,15 +10,14 @@ Copyright (c) 2021 KU Leuven. All rights reserved.
 """
 
 import sys
-import random
-import argparse
-import logging
 import numpy as np
 import pyspiel
+import os
+
 from open_spiel.python.algorithms import evaluate_bots
+import external_sampling_mccfr as external_sampling_mccfr
+from open_spiel.python.algorithms import mccfr
 
-
-logger = logging.getLogger('be.kuleuven.cs.dtai.fcpa')
 
 
 def get_agent_for_tournament(player_id):
@@ -32,49 +31,223 @@ def get_agent_for_tournament(player_id):
     my_player = Agent(player_id)
     return my_player
 
-
+def find_between( s, first, last ):
+      try:
+        start = s.index( first ) + len( first )
+        end = s.index( last, start )
+        return s[start-1:end+1]
+      except ValueError:
+        return ""
+def simplify_info_key_fcpa(cur_player,state):
+    # example [Round 0][Player: 0][Pot: 40000][Money: 19850 0][Private: TsTd][Public: ][Sequences: r20000]
+    #to [Private: TT][Public: ]  
+    #delete rounds player pot money
+    info_key = state.information_state_string(cur_player) 
+    legal_actions = state.legal_actions()
+    
+    #what actions are available 
+    actionString = "[Actions: "
+    for action in legal_actions:
+      
+        actionString += state.action_to_string(cur_player, action).split(' ')[1][5:]
+        
+    actionString += "]"    
+    
+    for i in range(4):
+      rounds = find_between(info_key,"[","]") 
+      info_key=info_key.replace(rounds,"",1)
+    newer_key="" 
+    #save private and public
+    for i in range(2):
+      rounds = find_between(info_key,"[","]") 
+      info_key=info_key.replace(rounds,"",1)  
+      rounds = simplify_card_string(rounds)
+      newer_key+=rounds
+    return newer_key+actionString
+def simplify_card_string(cards):
+      splitted = cards.split(": ")
+      cards= splitted[1][:-1]
+      pre  = splitted[0][1:] 
+      newcards=""
+      for i in range(0,len(cards),2):
+            card = cards[i]
+            newcards+=card  
+      return "["+pre+": "+newcards+"]"    
+            
+            
 class Agent(pyspiel.Bot):
     """Agent template"""
 
     def __init__(self, player_id):
-        """Initialize an agent to play FCPA poker.
-
-        Note: This agent should make use of a pre-trained policy to enter
-        the tournament. Initializing the agent should thus take no more than
-        a few seconds.
-        """
         pyspiel.Bot.__init__(self)
-        self.player_id = player_id
-
+        
+        package_directory = os.path.dirname(os.path.abspath(__file__))
+        model_file = os.path.join(package_directory, 'infostates', 'full_fpca_agent_infostats.npy')
+        fcpa_game_string = (
+        "universal_poker(betting=nolimit,numPlayers=2,numRounds=2,blind=150 100,"
+        "firstPlayer=2 1 1 1,numSuits=4,numRanks=13,numHoleCards=2,numBoardCards=0 3 1 1,"
+        "stack=20000 20000,bettingAbstraction=fcpa)")
+        
+        self.game = pyspiel.load_game(fcpa_game_string)
+        
+        self.infostates=np.load(model_file,allow_pickle=True)[()] 
+        self.state= self.game.new_initial_state()
+       
+        self.solver = external_sampling_mccfr.ExternalSamplingSolver(
+                    self.game, external_sampling_mccfr.AverageType.SIMPLE)
+        self.solver._infostates= self.infostates
+        
+        self.average_policy   = self.solver.average_policy()
+        #print("BOT IS INITIALIZED")
     def restart_at(self, state):
-        """Starting a new game in the given state.
-
-        :param state: The initial state of the game.
-        """
-        self.state = state
+        self.state= state
 
     def inform_action(self, state, player_id, action):
-        """Let the bot know of the other agent's actions.
-
-        :param state: The current state of the game.
-        :param player_id: The ID of the player that executed an action.
-        :param action: The action which the player executed.
-        """
-        self.state = state
-
-    def step(self, state):
-        """Returns the selected action in the given state.
-
-        :param state: The current state of the game.
-        :returns: The selected action from the legal actions, or
-            `pyspiel.INVALID_ACTION` if there are no legal actions available.
-        """
+        
+            
+        
+        self.state= state
+        
+    def get_cards(self,info_key):
+        #wss 2 en 1 index want zo werkt splits i guess 
+        pubcards= info_key.split("]")[1].replace("[Public: ","",1)
+        privcards= info_key.split("]")[0].replace("[Private: ","",1) 
+        
+        return privcards+pubcards 
+    def create_valid_info_key(self,privcards,pubcards,actionsstring):
+        return "[Private: "+privcards+"][Public: "+pubcards+"]"+actionsstring
+    
+    def get_average_probabilities(self,info_key,state):
+        
         legal_actions = state.legal_actions()
-        if len(legal_actions)==0:
-            return pyspiel.INVALID_ACTION
-        else:
-            return random.choice(legal_actions)
+        retrieved_infostate = self.solver._infostates.get(info_key, None)
+        if retrieved_infostate is None:
+            return {a: 1 / len(legal_actions) for a in legal_actions}
+        avstrat = (
+            retrieved_infostate[mccfr.AVG_POLICY_INDEX] /
+            retrieved_infostate[mccfr.AVG_POLICY_INDEX].sum())
+        return {legal_actions[i]: avstrat[i] for i in range(len(legal_actions))}   
+    
+    def step(self, state):
+        #print()
+        #print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")
+        #print("START OUR AGENT TURN: ")
+        
+        cur_player = state.current_player()
 
+        info_state_key = simplify_info_key_fcpa(cur_player,self.state) 
+        info_key = state.information_state_string(cur_player) 
+        cards = self.get_cards(info_state_key)
+        legal_actions = state.legal_actions()
+        num_legal_actions = len(legal_actions)
+        
+        privcards = cards[:2]
+        pubcards = cards[2:]
+        #print("TOTAL INFO_STATE: ",info_key)
+        #print("INFO STATE: ",info_state_key)
+        
+        all_subcards=[]
+        if len(pubcards)<=3:
+            chances= []
+            actions= []
+            act_prob= self.get_average_probabilities(info_state_key,state) 
+            
+            for action in  act_prob:
+                chance =  act_prob[action]
+                chances.append(chance)
+                actions.append(action)
+                
+                 
+            chosen_action = np.random.choice(np.array(actions), p=np.array(chances))
+            #INFO #print STUFF
+            #print("CHOSE ACTION: ",state.action_to_string(cur_player, chosen_action).split(' ')[1][5:]," WITH ACTIONPROBABILITIES:")
+            pol_indx=0
+            for action in actions:
+                #print(state.action_to_string(cur_player, action).split(' ')[1][5:]+" : ",np.array(chances)[pol_indx])
+                pol_indx+=1
+            value=0 
+            for idx in range(num_legal_actions):
+                infos=self.solver._lookup_infostate_info(info_state_key,num_legal_actions) 
+                avret = infos[mccfr.REGRET_INDEX][idx]*np.array(chances)[idx]
+                value+=avret
+            value= value/infos[mccfr.AVG_POLICY_INDEX].sum()        
+            #print("STAE INFO: ",infos)    
+            #print("AVERAGE VALUE OF CARDS: ",value)        
+            #print("END OUR AGENT TURN")
+            #print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––")       
+            return chosen_action
+        actionString = "[Actions: "
+        for action in legal_actions:
+            actionString += state.action_to_string(cur_player, action).split(' ')[1][5:] 
+        actionString += "]"  
+        if (len(pubcards)==4):
+            #4 public cards
+            for i in range(len(pubcards)):    
+                all_subcards.append(pubcards.replace(pubcards[i],"",1))
+                
+                
+        else:
+            #5 public cards  
+            for i in range(len(pubcards)):    
+                first=i
+                second= (i+1)%len(pubcards)
+                newstring= pubcards.replace(pubcards[first],"",1)
+                all_subcards.append(newstring.replace(pubcards[second],"",1))
+        
+        policys=[]
+        maxes = []
+        sub_keys=[]
+        #print("ALL SUBCARDS: ",all_subcards)
+        for subcards in all_subcards:
+            value=0
+
+            #print()
+            sub_info_key =  self.create_valid_info_key(privcards,subcards,actionString)  
+            sub_keys.append(sub_info_key)
+            #print("SUBINFO KEY: ",sub_info_key) 
+            act_prob= self.get_average_probabilities(sub_info_key,state)
+            
+            chances=[]
+            actions=[] 
+            for action in  act_prob:
+                chance =  act_prob[action]
+                chances.append(chance)
+                actions.append(action)
+            policy=np.array(chances)
+            
+            policys.append(policy)
+            #selection metric select on highest average regret if the policy is played out 
+            for idx in range(num_legal_actions):
+                infos=self.solver._lookup_infostate_info(sub_info_key,num_legal_actions) 
+                avret = infos[mccfr.REGRET_INDEX][idx]*policy[idx]
+                value+=avret
+            value= value/infos[mccfr.AVG_POLICY_INDEX].sum()        
+            #print("STAE INFO: ",infos)    
+            #print("WITh A VALUE OF: ",value)
+            #print("WITH POLICY: ",policy)
+            #print()
+            maxes.append(value)
+        
+        #choose the policy with a maximum chance      
+        #bestpolicy= policys[maxes.index((max(maxes)))]
+        
+        #choose the average policy of the subsets with
+        bestpolicy= np.sum(policys,axis=0)/len(policys)
+         
+        best_key= sub_keys[maxes.index((max(maxes)))]
+        chosen_action = np.random.choice(np.array(actions), p=np.array(bestpolicy))
+        
+        #print("BEST SUBKEY: ",best_key)
+        #print("CHOSE ACTION: ",state.action_to_string(cur_player, chosen_action).split(' ')[1][5:]," WITH ACTIONPROBABILITIES:")
+        
+        pol_indx=0
+        for action in legal_actions:
+            #print(state.action_to_string(cur_player, action).split(' ')[1][5:]+" : ", bestpolicy[pol_indx])
+            pol_indx+=1
+        #print("END OUR AGENT TURN")
+        #print("––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––") 
+        #print()   
+        return chosen_action
 
 def test_api_calls():
     """This method calls a number of API calls that are required for the
@@ -90,7 +263,7 @@ def test_api_calls():
     assert len(returns) == 2
     assert isinstance(returns[0], float)
     assert isinstance(returns[1], float)
-    print("SUCCESS!")
+    #print("SUCCESS!")
 
 
 def main(argv=None):
