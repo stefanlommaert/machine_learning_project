@@ -112,12 +112,12 @@ def play_game(i):
     print("Player 2 average rewards: ",averagerewardsP2)
        
         
-episodes = 100000
+episodes = 1000000
 play_game(episodes)
 #plt.axis('square')
 plt.title("Epsilon Greedy: "+plot_name+ ", episodes = "+str(episodes))
-plt.xlabel('Player 1, probability of action 1')
-plt.ylabel('Player 2, probability of action 1')
+plt.xlabel('Episode')
+plt.ylabel('Minimal distance to any Nash (%)')
 #plt.axis([0, 1, 0, 1])
 
 actual_nash= [[np.array([0.5,0.5])]]

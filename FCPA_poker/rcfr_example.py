@@ -29,7 +29,7 @@ tf.enable_eager_execution()
 
 FLAGS = flags.FLAGS
 
-flags.DEFINE_integer("iterations", 100, "Number of iterations")
+flags.DEFINE_integer("iterations", 10, "Number of iterations")
 flags.DEFINE_string("game", "kuhn_poker", "Name of the game")
 flags.DEFINE_integer("players", 2, "Number of players")
 flags.DEFINE_integer("print_freq", 10, "How often to print the exploitability")
@@ -52,7 +52,7 @@ flags.DEFINE_boolean(
     "use_skip_connections", True,
     "Whether or not to use skip connections in the regret model.")
 flags.DEFINE_integer(
-    "num_epochs", 200,
+    "num_epochs", 10,
     "The number of epochs to run between each iterations to update the regret "
     "models.")
 flags.DEFINE_integer("batch_size", 100, "The regret model training batch size.")
@@ -110,14 +110,10 @@ def main(_):
   # End of _train_fn
 
   for i in range(FLAGS.iterations):
+    print("iteration= ",i)    
     solver.evaluate_and_update_policy(_train_fn)
-    if i % FLAGS.print_freq == 0:
-      for key in solver.average_policy():
-        print(key, ' : ', solver.average_policy()[key])
-      print(solver._sequence_weights)    
-      nash_conv = pyspiel.exploitability(game, solver.average_policy())*2
-      
-      print("Iteration {} exploitability {}".format(i, nash_conv))
+    
+
       
 
 

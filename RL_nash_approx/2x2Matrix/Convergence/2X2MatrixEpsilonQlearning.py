@@ -1,4 +1,3 @@
-import re
 from matplotlib import pyplot as plt
 import numpy as np
 import random
@@ -38,12 +37,12 @@ c21 = vector_player[1][0]
 c22 = vector_player[1][1]
 
 game = pyspiel.create_matrix_game(row_player, vector_player)
-# game = pyspiel.load_matrix_game("matrix_pd")
+#game = pyspiel.load_matrix_game("matrix_pd")
 payoff_tensor= game_payoffs_array(game) 
 
 rewardsP1  =[0,0]
 countsP1   =[0,0] 
-averagerewardsP1 = [0,0] 
+averagerewardsP1 = [0,0]
 
 rewardsP2  = [0,0]
 countsP2   = [0,0] 
@@ -53,8 +52,6 @@ averagerewardsP2= [0,0]
 def P1explore():
     return random.choice(options)
 
-def P1exploit():
-    return averagerewardsP1.index(max(averagerewardsP1))
 
 def P1_select_action():
     if (random.random()<epsilon):
@@ -65,8 +62,6 @@ def P1_select_action():
 def P2explore():
     return random.choice(options)
 
-def P2exploit():
-    return averagerewardsP2.index(max(averagerewardsP2))
 
 def P2_select_action():
     if (random.random()<epsilon):
@@ -74,6 +69,45 @@ def P2_select_action():
     else:
         return P2exploit()
     
+def P1exploit():
+    if sum(countsP1)==0 : 
+        alpha=0.5
+        beta=0.5
+    
+    else:
+        alpha = float(countsP1[0])/float(sum(countsP1))
+        beta  = float(countsP2[0])/float(sum(countsP2))
+                                
+    
+    
+    r11 = row_player[0][0]
+    r12 = row_player[0][1]
+    r21 = row_player[1][0]
+    r22 = row_player[1][1]
+    utility_action1 = r11*(beta)+r12*(1-beta)
+    utility_action2 = r21*beta +r22*(1-beta)
+     
+    return (0 if (utility_action1>utility_action2) else 1)
+
+def P2exploit():
+    if sum(countsP1)==0 : 
+        alpha=0.5
+        beta=0.5
+    
+    else:
+        alpha = float(countsP1[0])/float(sum(countsP1))
+        beta  = float(countsP2[0])/float(sum(countsP2))
+                                
+    
+    
+    r11 = vector_player[0][0]
+    r12 = vector_player[0][1]
+    r21 = vector_player[1][0]
+    r22 = vector_player[1][1]
+    utility_action1 = r11*(alpha)+r21*(1-alpha) #want r(i,j) met j de keuzen va player 2
+    utility_action2 = r12*(alpha)+r22*(1-alpha)
+     
+    return (0 if (utility_action1>utility_action2) else 1)
 
 def update(p1action,p2action):
     payoffP1 = payoff_tensor[0,p1action,p2action]
@@ -112,12 +146,12 @@ def play_game(i):
     print("Player 2 average rewards: ",averagerewardsP2)
        
         
-episodes = 100000
+episodes = 1000 
 play_game(episodes)
-#plt.axis('square')
-plt.title("Epsilon Greedy: "+plot_name+ ", episodes = "+str(episodes))
-plt.xlabel('Player 1, probability of action 1')
-plt.ylabel('Player 2, probability of action 1')
+
+plt.title("Epsilon Q_learning: "+plot_name+", episodes = "+str(episodes))
+plt.xlabel('Episode')
+plt.ylabel('Minimal distance to any Nash (%)')
 #plt.axis([0, 1, 0, 1])
 
 actual_nash= [[np.array([0.5,0.5])]]
@@ -155,6 +189,9 @@ plt.plot(range(len(totalvalues)),np.array(totalvalues))
 #              ha='center',
 #              fontsize=10) # horizontal alignment can be left, right or center
 plt.show()
+
+
+ 
 
 
  
